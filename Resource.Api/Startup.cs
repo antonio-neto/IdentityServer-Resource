@@ -7,7 +7,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Resource.Api.Configs;
-using System.Collections.Generic;
 using System.Security.Claims;
 
 namespace Resource.Api
@@ -24,13 +23,16 @@ namespace Resource.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var identityServerOptions = new IdentityServerOptions();
+            Configuration.Bind("IdentityServer", identityServerOptions);
+
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;                
             }).AddJwtBearer(o =>
             {
-                o.Authority = "http://localhost:5000";
+                o.Authority = identityServerOptions.AuthorityUrl;
                 o.Audience = "resourceapi";
                 o.RequireHttpsMetadata = false;
             });
